@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة GPMS - نظام إدارة مشاريع التخرج</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-950: #060c1a;
+            --navy-900: #0a1628;
+            --navy-800: #0f2040;
+            --navy-700: #152a55;
+            --navy-600: #1a3568;
+            --blue-500: #3b6fd4;
+            --blue-400: #5b8fe8;
+            --blue-300: #7aaaf0;
+            --purple-500: #7c5cbf;
+            --purple-400: #9b7fd4;
+            --purple-300: #b49ee0;
+            --accent: #7c5cbf;
+            --accent-glow: rgba(124,92,191,0.35);
+            --text-primary: #e8edf8;
+            --text-secondary: #94a3c4;
+            --text-muted: #5a6a8a;
+            --border: rgba(255,255,255,0.07);
+            --border-hover: rgba(124,92,191,0.4);
+            --card-bg: rgba(10,22,40,0.8);
+            --glass: rgba(15,32,64,0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--navy-950);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* ─── Background ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(124,92,191,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(59,111,212,0.1) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 40% at 50% 50%, rgba(10,22,40,0.4) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Grid pattern */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+        /* ─── NAV ─── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 16px 0;
+            background: rgba(6,12,26,0.75);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo-badge {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--purple-500), var(--blue-500));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .nav-logo-text {
+            font-weight: 800;
+            font-size: 18px;
+            background: linear-gradient(135deg, #fff 40%, var(--purple-300));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-tag {
+            font-size: 11px;
+            color: var(--purple-300);
+            background: rgba(124,92,191,0.15);
+            border: 1px solid rgba(124,92,191,0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+            position: relative;
+        }
+
+        .hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 24px 60px;
+            text-align: center;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(124,92,191,0.12);
+            border: 1px solid rgba(124,92,191,0.35);
+            color: var(--purple-300);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 7px 18px;
+            border-radius: 30px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            animation: fadeDown 0.8s ease forwards;
+        }
+
+        .hero-eyebrow::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--purple-400);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% { opacity:1; transform:scale(1); }
+            50% { opacity:0.5; transform:scale(1.4); }
+        }
+
+        .hero-title {
+            font-size: clamp(2.4rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 10px;
+            animation: fadeDown 0.9s 0.1s ease both;
+        }
+
+        .hero-title .gpms {
+            background: linear-gradient(135deg, var(--purple-300) 0%, var(--blue-300) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 18px auto 44px;
+            line-height: 1.9;
+            animation: fadeDown 1s 0.2s ease both;
+        }
+
+        .hero-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 60px;
+            animation: fadeDown 1.1s 0.3s ease both;
+        }
+
+        .hero-tag {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 12px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .hero-tag:hover {
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .hero-tag span { font-size: 15px; }
+
+        /* Hero image showcase */
+        .hero-mockup {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            animation: fadeUp 1.2s 0.4s ease both;
+        }
+
+        .hero-mockup-glow {
+            position: absolute;
+            inset: -40px;
+            background: radial-gradient(ellipse at center, rgba(124,92,191,0.25) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-mockup-frame {
+            background: var(--navy-800);
+            border: 1px solid rgba(124,92,191,0.3);
+            border-radius: 20px;
+            padding: 8px;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.05),
+                0 40px 80px rgba(0,0,0,0.5),
+                0 0 60px rgba(124,92,191,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-mockup-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-r { background: #ff5f57; }
+        .dot-y { background: #ffbd2e; }
+        .dot-g { background: #28c840; }
+
+        .hero-mockup-img {
+            width: 100%;
+            border-radius: 12px;
+            display: block;
+            min-height: 300px;
+            background: var(--navy-700);
+            object-fit: cover;
+        }
+
+        /* ─── SECTIONS TITLE ─── */
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-label {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--purple-400);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 15px;
+            max-width: 540px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .section-line {
+            width: 56px; height: 3px;
+            background: linear-gradient(90deg, var(--purple-500), var(--blue-500));
+            margin: 20px auto 0;
+            border-radius: 2px;
+        }
+
+        /* ─── FEATURE SECTIONS ─── */
+        .features { padding: 100px 0; }
+
+        .feature-block {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            margin-bottom: 100px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .feature-block.visible { opacity: 1; transform: translateY(0); }
+        .feature-block.reverse { direction: ltr; }
+        .feature-block.reverse .feature-content { direction: rtl; }
+
+        .feature-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, rgba(124,92,191,0.2), rgba(59,111,212,0.2));
+            border: 1px solid rgba(124,92,191,0.35);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--purple-300);
+            margin-bottom: 16px;
+        }
+
+        .feature-title {
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            font-weight: 800;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            line-height: 2;
+            font-size: 14.5px;
+        }
+
+        .feature-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .pill {
+            font-size: 11px;
+            color: var(--purple-300);
+            background: rgba(124,92,191,0.12);
+            border: 1px solid rgba(124,92,191,0.25);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
+        /* Image card */
+        .img-card {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--navy-800);
+            border: 1px solid var(--border);
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.4),
+                0 0 0 1px rgba(255,255,255,0.04);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .img-card:hover {
+            transform: translateY(-6px);
+            box-shadow:
+                0 30px 80px rgba(0,0,0,0.5),
+                0 0 40px rgba(124,92,191,0.15),
+                0 0 0 1px rgba(124,92,191,0.2);
+        }
+
+        .img-card-top {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .img-card-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-right: auto;
+        }
+
+        .img-card img {
+            width: 100%;
+            display: block;
+            min-height: 220px;
+            object-fit: cover;
+            background: var(--navy-700);
+        }
+
+        .img-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(6,12,26,0.3) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* Two-image card */
+        .img-double {
+            display: grid;
+            grid-template-columns: 1fr 0.5fr;
+            gap: 8px;
+            padding: 1px;
+            background: var(--navy-800);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .img-double img {
+            width: 100%;
+            border-radius: 12px;
+            display: block;
+            min-height: 180px;
+            object-fit: cover;
+            background: var(--navy-700);
+        }
+
+        /* ─── STATS ─── */
+        .stats-section {
+            padding: 80px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 40px 24px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .stat-item:first-child { border-radius: 16px 0 0 16px; }
+        .stat-item:last-child { border-radius: 0 16px 16px 0; }
+
+        .stat-item:hover {
+            background: rgba(124,92,191,0.08);
+            border-color: rgba(124,92,191,0.25);
+        }
+
+        .stat-num {
+            font-size: 2.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--purple-300), var(--blue-300));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* ─── TECH STACK ─── */
+        .tech-section { padding: 100px 0; }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .tech-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .tech-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+            background: rgba(124,92,191,0.08);
+        }
+
+        .tech-icon { font-size: 28px; margin-bottom: 10px; }
+        .tech-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+        .tech-role { font-size: 12px; color: var(--text-muted); }
+
+        /* ─── FOOTER ─── */
+        footer {
+            background: rgba(6,12,26,0.95);
+            border-top: 1px solid var(--border);
+            padding: 60px 0 32px;
+        }
+
+        .footer-brand {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand h3 {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--purple-300), var(--blue-300));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .footer-divider {
+            width: 1px;
+            height: 30px;
+            background: var(--border);
+            margin: 0 auto 32px;
+        }
+
+        .team-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .team-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .team-link:hover {
+            border-color: rgba(124,92,191,0.45);
+            color: var(--text-primary);
+            background: rgba(124,92,191,0.1);
+            transform: translateY(-2px);
+        }
+
+        .team-link-icon {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--purple-500), var(--blue-500));
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .footer-copy {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 900px) {
+            .feature-block {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+            .feature-block.reverse { direction: rtl; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .stat-item:first-child { border-radius: 16px 0 0 0; }
+            .stat-item:last-child { border-radius: 0 0 0 16px; }
+            .stat-item:nth-child(2) { border-radius: 0 16px 0 0; }
+            .stat-item:nth-child(3) { border-radius: 0 0 16px 0; }
+        }
+
+        @media (max-width: 600px) {
+            .hero-inner { padding: 60px 20px 40px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .img-double { grid-template-columns: 1fr; }
+            .tech-grid { grid-template-columns: repeat(2, 1fr); }
+            .nav-tag { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="nav-inner">
+            <div class="nav-logo">
+                <div class="nav-logo-badge">🎓</div>
+                <span class="nav-logo-text">GPMS</span>
+            </div>
+            <span class="nav-tag">مشروع التخرج · 2026</span>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-inner container">
+            <div class="hero-eyebrow">مشروع التخرج  — جامعة القصيم 2026</div>
+            <h1 class="hero-title">
+                نظام إدارة مشاريع التخرج<br>
+                <span class="gpms">GPMS</span>
+            </h1>
+            <p class="hero-subtitle">
+                منصة رقمية متكاملة تم تطويرها لأتمتة وتسهيل دورة حياة مشاريع التخرج بالكامل بجامعة القصيم، لتقليص العمل اليدوي وتوفير بيئة تواصل ذكية وآمنة.
+            </p>
+            <div class="hero-tags">
+                <div class="hero-tag"><span>⚙️</span> MVC Architecture (Laravel/MySQL)</div>
+                <div class="hero-tag"><span>🤖</span> Intelligent Workflow & AI Automation</div>
+                <div class="hero-tag"><span>🔒</span> Secure Role-Based Access Control</div>
+            </div>
+            <div class="hero-mockup">
+                <div class="hero-mockup-glow"></div>
+                <div class="hero-mockup-frame">
+                    <div class="hero-mockup-bar">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div>
+                    </div>
+                    <img src="photos/w.jpeg" alt="واجهة GPMS" class="hero-mockup-img">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-num">5</div>
+                    <div class="stat-label">أدوار مستخدمين مختلفة</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num">7+</div>
+                    <div class="stat-label">وحدات وظيفية متكاملة</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num">AI</div>
+                    <div class="stat-label">مساعد ذكي مدمج</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num">2026</div>
+                    <div class="stat-label">مشروع التخرج</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN FEATURES -->
+    <main class="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">أقسام المنصة</span>
+                <h2 class="section-title">أقسام وخدمات المنصة الذكية</h2>
+                <p class="section-desc">هندسة برمجية متكاملة تخدم الطالب، المشرف، ولجنة المشاريع في آن واحد.</p>
+                <div class="section-line"></div>
+            </div>
+
+            <!-- 01 Login -->
+            <div class="feature-block" id="f1">
+                <div class="feature-content">
+                    <div class="feature-num">01</div>
+                    <h3 class="feature-title">واجهة تسجيل الدخول<br><span style="color:var(--purple-300)">Secure Login Gateway</span></h3>
+                    <p class="feature-desc">
+                        بوابة دخول آمنة وموحدة تتيح لكل مستخدم الوصول إلى صلاحياته ومساحة العمل الخاصة به بناءً على دوره في النظام، مع حماية كاملة لبيانات المستخدمين.
+                    </p>
+                    <div class="feature-pills">
+                        <span class="pill">JWT Authentication</span>
+                        <span class="pill">Role-Based Access</span>
+                        <span class="pill">Encrypted Sessions</span>
+                    </div>
+                </div>
+                <div class="img-card">
+                    <div class="img-card-top">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div>
+                        <span class="img-card-label">Login Screen</span>
+                    </div>
+                    <img src="photos/w.jpeg" alt="واجهة تسجيل الدخول">
+                    <div class="img-card-overlay"></div>
+                </div>
+            </div>
+
+            <!-- 02 Student Portal -->
+            <div class="feature-block reverse" id="f2">
+                <div class="feature-content">
+                    <div class="feature-num">02</div>
+                    <h3 class="feature-title">بوابة الطالب<br><span style="color:var(--purple-300)">Student Portal</span></h3>
+                    <p class="feature-desc">
+                        مساحة تفاعلية متكاملة تمكّن الطلاب من تشكيل الفرق بالرقم الجامعي، ورفع تسليمات المشروع والكود، وتتبع الملاحظات الأكاديمية والجدول الزمني لحظة بلحظة.
+                    </p>
+                    <div class="feature-pills">
+                        <span class="pill">Team Formation</span>
+                        <span class="pill">File Submissions</span>
+                        <span class="pill">Live Timeline</span>
+                    </div>
+                </div>
+                <div class="img-double">
+                    <img src="photos/s.png" alt="بوابة الطالب 1">
+                    <img src="photos/s2.png" alt="بوابة الطالب 2">
+                </div>
+            </div>
+
+            <!-- 03 Committee -->
+            <div class="feature-block" id="f3">
+                <div class="feature-content">
+                    <div class="feature-num">03</div>
+                    <h3 class="feature-title">بوابة لجنة مشاريع التخرج<br><span style="color:var(--purple-300)">GP Committee Portal</span></h3>
+                    <p class="feature-desc">
+                        المركز الإداري للمنصة؛ يتيح للجنة فرز مقترحات المشاريع، واعتماد الفرق، وتشغيل خوارزمية التوزيع الآلي للمجموعات بناءً على العبء التدريسي للمشرفين.
+                    </p>
+                    <div class="feature-pills">
+                        <span class="pill">Auto-Assignment Algorithm</span>
+                        <span class="pill">Proposal Review</span>
+                        <span class="pill">Load Balancing</span>
+                    </div>
+                </div>
+                <div class="img-card">
+                    <div class="img-card-top">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div>
+                        <span class="img-card-label">Committee Dashboard</span>
+                    </div>
+                    <img src="photos/c.png" alt="بوابة اللجنة">
+                    <div class="img-card-overlay"></div>
+                </div>
+            </div>
+
+            <!-- 04 Supervisor -->
+            <div class="feature-block reverse" id="f4">
+                <div class="feature-content">
+                    <div class="feature-num">04</div>
+                    <h3 class="feature-title">بوابة المشرف / الدكتور<br><span style="color:var(--purple-300)">Supervisor Portal</span></h3>
+                    <p class="feature-desc">
+                        بيئة عمل رقمية تتيح لأعضاء هيئة التدريس طرح مقترحات المشاريع، ومتابعة أداء المجموعات، ومراجعة التقارير المرفوعة ورصد التقييمات والدرجات بكل سهولة.
+                    </p>
+                    <div class="feature-pills">
+                        <span class="pill">Report Reviews</span>
+                        <span class="pill">Grade Management</span>
+                        <span class="pill">Project Proposals</span>
+                    </div>
+                </div>
+                <div class="img-card">
+                    <div class="img-card-top">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div>
+                        <span class="img-card-label">Supervisor Dashboard</span>
+                    </div>
+                    <img src="photos/d.png" alt="بوابة المشرف">
+                    <div class="img-card-overlay"></div>
+                </div>
+            </div>
+
+            <!-- 05 Dept Head -->
+            <div class="feature-block" id="f5">
+                <div class="feature-content">
+                    <div class="feature-num">05</div>
+                    <h3 class="feature-title">بوابة رئيس القسم<br><span style="color:var(--purple-300)">Department Head Portal</span></h3>
+                    <p class="feature-desc">
+                        واجهة إشرافية عليا توفر نظرة شاملة وتقارير إحصائية دقيقة حول سير مشاريع التخرج في القسم، ونسب الإنجاز, مع صلاحية الاعتماد النهائي للمخرجات.
+                    </p>
+                    <div class="feature-pills">
+                        <span class="pill">Analytics Dashboard</span>
+                        <span class="pill">Final Approval</span>
+                        <span class="pill">Progress Reports</span>
+                    </div>
+                </div>
+                <div class="img-card">
+                    <div class="img-card-top">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div>
+                        <span class="img-card-label">Head of Department View</span>
+                    </div>
+                    <img src="photos/h.png" alt="بوابة رئيس القسم">
+                    <div class="img-card-overlay"></div>
+                </div>
+            </div>
+
+            <!-- 06 Admin -->
+            <div class="feature-block reverse" id="f6">
+                <div class="feature-content">
+                    <div class="feature-num">06</div>
+                    <h3 class="feature-title">بوابة مدير النظام<br><span style="color:var(--purple-300)">Admin Portal</span></h3>
+                    <p class="feature-desc">
+                        التحكم الشامل في إعدادات النظام، وإدارة حسابات وصلاحيات المستخدمين، وتهيئة الفصول الدراسية وتحديد المواعيد النهائية (Deadlines) للترم الدراسي.
+                    </p>
+                    <div class="feature-pills">
+                        <span class="pill">User Management</span>
+                        <span class="pill">System Config</span>
+                        <span class="pill">Deadline Control</span>
+                    </div>
+                </div>
+                <div class="img-card">
+                    <div class="img-card-top">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div>
+                        <span class="img-card-label">Admin Control Panel</span>
+                    </div>
+                    <img src="photos/c.png" alt="بوابة الإدارة">
+                    <div class="img-card-overlay"></div>
+                </div>
+            </div>
+
+            <!-- 07 AI Chatbot -->
+            <div class="feature-block" id="f7">
+                <div class="feature-content">
+                    <div class="feature-num">07</div>
+                    <h3 class="feature-title">المساعد الذكي بالذكاء الاصطناعي<br><span style="color:var(--purple-300)">AI-Powered Chatbot</span></h3>
+                    <p class="feature-desc">
+                        نظام دعم ذكي مدمج يعمل على مدار الساعة للإجابة الفورية عن استفسارات الطلاب وأعضاء هيئة التدريس حول لوائح مشاريع التخرج ومواعيد التسليم بدقة وكفاءة.
+                    </p>
+                    <div class="feature-pills">
+                        <span class="pill">24/7 Support</span>
+                        <span class="pill">NLP Processing</span>
+                        <span class="pill">Smart Answers</span>
+                    </div>
+                </div>
+                <div class="img-card">
+                    <div class="img-card-top">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div>
+                        <span class="img-card-label">AI Assistant Interface</span>
+                    </div>
+                    <img src="photos/p4.jpg" alt="المساعد الذكي">
+                    <div class="img-card-overlay"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- TECH STACK -->
+    <section class="tech-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">التقنيات المستخدمة</span>
+                <h2 class="section-title">Stack التقني</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <div class="tech-icon">🐘</div>
+                    <div class="tech-name">Laravel</div>
+                    <div class="tech-role">Backend Framework</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🗄️</div>
+                    <div class="tech-name">MySQL</div>
+                    <div class="tech-role">Database</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🎨</div>
+                    <div class="tech-name">Blade / CSS</div>
+                    <div class="tech-role">Frontend Views</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🤖</div>
+                    <div class="tech-name">AI Chatbot</div>
+                    <div class="tech-role">Smart Assistant</div>
+                </div>
+         
+                <div class="tech-card">
+                    <div class="tech-icon">⚡</div>
+                    <div class="tech-name">REST API</div>
+                    <div class="tech-role">Data Layer</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-brand">
+                <h3>فريق تطوير GPMS</h3>
+                <p>تم تطوير النظام بكل فخر واعتزاز بواسطة طلاب علوم الحاسب بكلية الحاسب - جامعة القصيم</p>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="team-grid">
+                <a href="https://www.linkedin.com/in/albarq-alftaihi/" target="_blank" class="team-link">
+                    <div class="team-link-icon">🔗</div>البرق الفتيحي
+                </a>
+                <a href="https://www.linkedin.com/in/mohammed-alhmati-5a237a35a/" target="_blank" class="team-link">
+                    <div class="team-link-icon">🔗</div>محمد الحماطي
+                </a>
+                <a href="https://www.linkedin.com/in/obaid-bin-abadat/" target="_blank" class="team-link">
+                    <div class="team-link-icon">🔗</div>عبيد بن عبدات
+                </a>
+                <a href="https://www.linkedin.com/in/faisal-aljaoni/" target="_blank" class="team-link">
+                    <div class="team-link-icon">🔗</div>فيصل ثابت
+                </a>
+                <a href="https://www.linkedin.com/in/mohammed-alnehabi/" target="_blank" class="team-link">
+                    <div class="team-link-icon">🔗</div>محمد النهابي
+                </a>
+            </div>
+            <div class="footer-copy">
+                © 2026 GPMS Platform 
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll reveal
+        const blocks = document.querySelectorAll('.feature-block');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    observer.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        blocks.forEach(b => observer.observe(b));
+    </script>
+</body>
+</html>
+
+
+
