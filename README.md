@@ -1,5 +1,5 @@
-GPMS – Graduation Project Management System (Graduation Project)
-Developed an integrated electronic platform to automate the management lifecycle of academic graduation projects, enhancing task tracking and communication workflows between students and supervisors.
+# GPMS – Graduation Project Management System (Graduation Project)
+-Developed an integrated electronic platform to automate the management lifecycle of academic graduation projects, enhancing task tracking and communication workflows between students and supervisors.
 
 Key Features & Contributions:
 • Built a centralized dashboard for real-time project tracking and task assignment.
